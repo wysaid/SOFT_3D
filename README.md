@@ -6,10 +6,10 @@
 <p>本版本已内置EGE13.04版，无需安装EGE。欢迎各位感兴趣的同学取用参考</p>
 <p>LICENSE 请参照The MIT License</p>
 <h2>ScreenShot1</h2>
-<p><img src="https://raw.github.com/wysaid/EGE_3D/master/screenshot0.jpg"></p>
+<p><img src="https://raw.github.com/wysaid/SOFT_3D/master/screenshot0.jpg"></p>
 
 <h2>ScreenShot2</h2>
-<p><img src="https://raw.github.com/wysaid/EGE_3D/master/screenshot1.jpg"></p>
+<p><img src="https://raw.github.com/wysaid/SOFT_3D/master/screenshot1.jpg"></p>
 
 <h2>ScreenShot3</h2>
-<p><img src="https://raw.github.com/wysaid/EGE_3D/master/screenshot2.jpg"></p>
+<p><img src="https://raw.github.com/wysaid/SOFT_3D/master/screenshot2.jpg"></p>
