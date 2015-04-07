@@ -1,3 +1,6 @@
+//Author: wysaid
+//blog: http://blog.wysaid.org
+
 #include "htMat.h"
 #include "htVec.h"
 #include "graphics.h"
