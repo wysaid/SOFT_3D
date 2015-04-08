@@ -4,7 +4,7 @@
 @Date: 2013-10-31
 @Description: Provide some cpu math algorithms like glsl shaders.
 @             Some algorithms are from http://www.opengl.org/
-@Attention: use radian, not degree!
+@Attention: I'm using radian, not degree!
 */
 
 #ifndef _CGE_MAT_H_
