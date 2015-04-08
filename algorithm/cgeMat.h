@@ -4,16 +4,22 @@
 @Date: 2013-10-31
 @Description: Provide some cpu math algorithms like glsl shaders.
 @             Some algorithms are from http://www.opengl.org/
+@Attention: use radian, not degree!
 */
 
-#ifndef _HT_MAT_H_
-#define _HT_MAT_H_
+#ifndef _CGE_MAT_H_
+#define _CGE_MAT_H_
 
 #include <cmath>
-#include "htStaticAssert.h"
-#include "htVec.h"
+#include <algorithm>
+#include "cgeStaticAssert.h"
+#include "cgeVec.h"
 
-namespace HTAlgorithm
+#ifndef M_PI
+#define M_PI 3.1415926589793f
+#endif
+
+namespace CGE
 {
 	inline void normalize(float& x, float& y, float& z)
 	{
@@ -34,6 +40,13 @@ namespace HTAlgorithm
 
 	struct Mat2
 	{
+		const static Mat2& makeIdentity()
+		{
+			const static Mat2 sIdentity =  Mat2(1.0f, 0.0f,
+				0.0f, 1.0f);
+			return sIdentity;
+		}
+
 		static inline Mat2& makeMatrix(Mat2& m, float m00, float m01,
 			float m10, float m11)
 		{
@@ -94,11 +107,24 @@ namespace HTAlgorithm
 			return *this = *this * m;
 		}
 
+		inline void loadIdentity()
+		{
+			*this = makeIdentity();
+		}
+
 		float data[2][2];
 	};
 
 	struct Mat3
 	{
+		const static Mat3& makeIdentity()
+		{
+			const static Mat3 sIdentity =  Mat3(1.0f, 0.0f, 0.0f,
+				0.0f, 1.0f, 0.0f,
+				0.0f, 0.0f, 1.0f);
+			return sIdentity;
+		}
+
 		static inline Mat3& makeMatrix(Mat3& m, float m00, float m01, float m02,
 			float m10, float m11, float m12,
 			float m20, float m21, float m22)
@@ -209,6 +235,11 @@ namespace HTAlgorithm
 			return *this = *this * m;
 		}
 
+		inline void rotate(float rad, float x, float y, float z)
+		{
+			*this *= makeRotation(rad, x, y, z);
+		}
+
 		inline void rotateX(float rad)
 		{
 			*this *= makeXRotation(rad); //待优化
@@ -222,6 +253,11 @@ namespace HTAlgorithm
 		inline void rotateZ(float rad)
 		{
 			*this *= makeZRotation(rad); //待优化
+		}
+
+		inline void loadIdentity()
+		{
+			*this = makeIdentity();
 		}
 
 		float data[3][3];
@@ -397,7 +433,7 @@ namespace HTAlgorithm
 			const float fan = farZ + nearZ;
 			const float fsn = farZ - nearZ;
 
-			return Mat4(.0f * nearZ / rsl, 0.0f, 0.0f, 0.0f,
+			return Mat4(2.0f * nearZ / rsl, 0.0f, 0.0f, 0.0f,
 				0.0f, 2.0f * nearZ / tsb, 0.0f, 0.0f,
 				ral / rsl, tab / tsb, -fan / fsn, -1.0f,
 				0.0f, 0.0f, (-2.0f * farZ * nearZ) / fsn, 0.0f);
@@ -423,16 +459,21 @@ namespace HTAlgorithm
 			Vec3f ev(eyeX, eyeY, eyeZ);
 			Vec3f cv(centerX, centerY, centerZ);
 			Vec3f uv(upX, upY, upZ);
-			Vec3f n((ev - cv).normalize());//GLKVector3Normalize(GLKVector3Add(ev, GLKVector3Negate(cv)));
-			Vec3f u(crossV3f(uv, n).normalize());
-			Vec3f v(crossV3f(n, u));
+			return makeLookAt(ev, cv, uv);
+		}
 
-			return Mat4(u[0], v[0], n[0], 0.0f,
-				u[1], v[1], n[1], 0.0f,
-				u[2], v[2], n[2], 0.0f,
-				-u.dot(ev),
-				-v.dot(ev),
-				-n.dot(ev),
+		static inline Mat4 makeLookAt(const Vec3f& eye, const Vec3f& center, const Vec3f& up)
+		{
+			Vec3f forward((eye - center).normalize());
+			Vec3f side(crossV3f(up, forward).normalize());
+			Vec3f upVector(crossV3f(forward, side));
+
+			return Mat4(side[0], upVector[0], forward[0], 0.0f,
+				side[1], upVector[1], forward[1], 0.0f,
+				side[2], upVector[2], forward[2], 0.0f,
+				-side.dot(eye),
+				-upVector.dot(eye),
+				-forward.dot(eye),
 				1.0f);
 		}
 
@@ -502,6 +543,36 @@ namespace HTAlgorithm
 			return true;
 		}
 
+		static inline bool projectM4fPerspective(const Vec3f& obj, const Mat4& modelView, const Mat4& proj, const Vec4f& viewPort, Vec2f& winCoord)
+		{
+			//Transformation vectors
+			float fTempo[8];
+			//modelView transform
+			fTempo[0]=modelView[0][0]*obj[0]+modelView[1][0]*obj[1]+modelView[2][0]*obj[2]+modelView[3][0];  //w is always 1
+			fTempo[1]=modelView[0][1]*obj[0]+modelView[1][1]*obj[1]+modelView[2][1]*obj[2]+modelView[3][1];
+			fTempo[2]=modelView[0][2]*obj[0]+modelView[1][2]*obj[1]+modelView[2][2]*obj[2]+modelView[3][2];
+			fTempo[3]=modelView[0][3]*obj[0]+modelView[1][3]*obj[1]+modelView[2][3]*obj[2]+modelView[3][3];
+			//proj transform, the final row of proj matrix is always [0.0, -1.0]
+			//so we optimize for that.
+			fTempo[4]=proj[0][0]*fTempo[0]+proj[1][0]*fTempo[1]+proj[2][0]*fTempo[2]+proj[3][0]*fTempo[3];
+			fTempo[5]=proj[0][1]*fTempo[0]+proj[1][1]*fTempo[1]+proj[2][1]*fTempo[2]+proj[3][1]*fTempo[3];
+			fTempo[6]=proj[0][2]*fTempo[0]+proj[1][2]*fTempo[1]+proj[2][2]*fTempo[2]+proj[3][2]*fTempo[3];
+			fTempo[7]=-fTempo[2];
+			//The result normalizes between -1 and 1
+			if(fTempo[7]==0.0f)	//The w value
+				return false;
+			fTempo[7]=1.0f/fTempo[7];
+			//Perspective division
+			fTempo[4]*=fTempo[7];
+			fTempo[5]*=fTempo[7];
+			fTempo[6]*=fTempo[7];
+			//Window coordinates
+			//Map x, y to range 0-1
+			winCoord[0]=(fTempo[4]*0.5f+0.5f)*viewPort[2]+viewPort[0];
+			winCoord[1]=(fTempo[5]*0.5f+0.5f)*viewPort[3]+viewPort[1];
+			return true;
+		}
+
 		static inline bool projectM4f(const Vec3f& obj, const Mat4& modelView, const Mat4& proj, const Vec4f& viewport, Vec3f& winCoord)
 		{
 			Vec4f result = (modelView * Vec4f(obj[0], obj[1], obj[2], 1.0f)) * proj;
@@ -517,6 +588,72 @@ namespace HTAlgorithm
 			winCoord[1] = viewport[1] + (1.0f + result[1]) * viewport[3] / 2.0f;
 
 			winCoord[2] = (1.0f + result[2]) / 2.0f;
+			return true;
+		}
+
+		static inline bool projectM4f(const Vec3f& obj, const Mat4& modelView, const Mat4& proj, const Vec4f& viewport, Vec2f& winCoord)
+		{
+			Vec4f result = (modelView * Vec4f(obj[0], obj[1], obj[2], 1.0f)) * proj;
+
+			if (result[3] == 0.0f)
+				return false;
+
+			result[0] /= result[3];
+			result[1] /= result[3];
+			result[2] /= result[3];
+
+			winCoord[0] = viewport[0] + (1.0f + result[0]) * viewport[2] / 2.0f;
+			winCoord[1] = viewport[1] + (1.0f + result[1]) * viewport[3] / 2.0f;
+			return true;
+		}
+
+		static inline bool projectM4f(const Vec2f& obj, const Mat4& modelView, const Mat4& proj, const Vec4f& viewport, Vec2f& winCoord)
+		{
+			Vec4f result = (modelView * Vec4f(obj[0], obj[1], 0.0f, 1.0f)) * proj;
+
+			if (result[3] == 0.0f)
+				return false;
+
+			result[0] /= result[3];
+			result[1] /= result[3];
+			result[2] /= result[3];
+
+			winCoord[0] = viewport[0] + (1.0f + result[0]) * viewport[2] / 2.0f;
+			winCoord[1] = viewport[1] + (1.0f + result[1]) * viewport[3] / 2.0f;
+			return true;
+		}
+
+		static inline bool projectM4f(const Vec3f& obj, const Mat4& modelViewProjection, const Vec4f& viewport, Vec3f& winCoord)
+		{
+			Vec4f result = modelViewProjection * Vec4f(obj[0], obj[1], obj[2], 1.0f);
+
+			if (result[3] == 0.0f)
+				return false;
+
+			result[0] /= result[3];
+			result[1] /= result[3];
+			result[2] /= result[3];
+
+			winCoord[0] = viewport[0] + (1.0f + result[0]) * viewport[2] / 2.0f;
+			winCoord[1] = viewport[1] + (1.0f + result[1]) * viewport[3] / 2.0f;
+
+			winCoord[2] = (1.0f + result[2]) / 2.0f;
+			return true;
+		}
+
+		static inline bool projectM4f(const Vec3f& obj, const Mat4& modelViewProjection, const Vec4f& viewport, Vec2f& winCoord)
+		{
+			Vec4f result = modelViewProjection * Vec4f(obj[0], obj[1], obj[2], 1.0f);
+
+			if (result[3] == 0.0f)
+				return false;
+
+			result[0] /= result[3];
+			result[1] /= result[3];
+			result[2] /= result[3];
+
+			winCoord[0] = viewport[0] + (1.0f + result[0]) * viewport[2] / 2.0f;
+			winCoord[1] = viewport[1] + (1.0f + result[1]) * viewport[3] / 2.0f;
 			return true;
 		}
 
@@ -607,13 +744,9 @@ namespace HTAlgorithm
 				data[0][3], data[1][3], data[2][3], data[3][3]);
 		}
 
-		inline const Mat4& loadIdentity()
+		inline void loadIdentity()
 		{
-			// 			return makeMatrix(*this, 1.0f, 0.0f, 0.0f, 0.0f,
-			// 				0.0f, 1.0f, 0.0f, 0.0f,
-			// 				0.0f, 0.0f, 1.0f, 0.0f,
-			// 				0.0f, 0.0f, 0.0f, 1.0f);
-			return *this = makeIdentity();
+			*this = makeIdentity();
 		}
 
 		inline const Mat4& initWithQuaternion(float x, float y, float z, float w)
@@ -674,6 +807,27 @@ namespace HTAlgorithm
 				data[0][1] * m[3][0] + data[1][1] * m[3][1] + data[2][1] * m[3][2] + data[3][1] * m[3][3],			
 				data[0][2] * m[3][0] + data[1][2] * m[3][1] + data[2][2] * m[3][2] + data[3][2] * m[3][3],			
 				data[0][3] * m[3][0] + data[1][3] * m[3][1] + data[2][3] * m[3][2] + data[3][3] * m[3][3]);
+		}
+
+		//特殊用法， 将mat3 直接转换为mat4 并与之相乘。
+		inline Mat4 operator*(const Mat3& m) const
+		{
+			return Mat4(data[0][0] * m[0][0] + data[1][0] * m[0][1] + data[2][0] * m[0][2],
+				data[0][1] * m[0][0] + data[1][1] * m[0][1] + data[2][1] * m[0][2],
+				data[0][2] * m[0][0] + data[1][2] * m[0][1] + data[2][2] * m[0][2],
+				data[0][3] * m[0][0] + data[1][3] * m[0][1] + data[2][3] * m[0][2],
+				data[0][0] * m[1][0] + data[1][0] * m[1][1] + data[2][0] * m[1][2],
+				data[0][1] * m[1][0] + data[1][1] * m[1][1] + data[2][1] * m[1][2],
+				data[0][2] * m[1][0] + data[1][2] * m[1][1] + data[2][2] * m[1][2],
+				data[0][3] * m[1][0] + data[1][3] * m[1][1] + data[2][3] * m[1][2],
+				data[0][0] * m[2][0] + data[1][0] * m[2][1] + data[2][0] * m[2][2],
+				data[0][1] * m[2][0] + data[1][1] * m[2][1] + data[2][1] * m[2][2],
+				data[0][2] * m[2][0] + data[1][2] * m[2][1] + data[2][2] * m[2][2],
+				data[0][3] * m[2][0] + data[1][3] * m[2][1] + data[2][3] * m[2][2],
+				data[3][0],
+				data[3][1],
+				data[3][2],
+				data[3][3]);
 		}
 
 		inline Mat4& operator*=(const Mat4& m)
@@ -843,6 +997,13 @@ namespace HTAlgorithm
 		inline void rotateZ(float rad)
 		{
 			*this *= makeZRotation(rad); //待优化
+		}
+
+		inline Mat3 toMat3()
+		{
+			return Mat3(data[0][0], data[0][1], data[0][2],
+				data[1][0], data[1][1], data[1][2],
+				data[2][0], data[2][1], data[2][2]);
 		}
 
 		float data[4][4];

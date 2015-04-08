@@ -1,36 +1,37 @@
 //Author: wysaid
 //blog: http://blog.wysaid.org
 
-#include "htMat.h"
-#include "htVec.h"
+#include "cgeMat.h"
+#include "cgeVec.h"
 #include "graphics.h"
 #include <vector>
 
-using namespace HTAlgorithm;
+using namespace CGE;
 
 class Object
 {
 public:
 	Object()
 	{
-		m_matProj = Mat4::makeOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
-//		m_matProj = Mat4::makeFrustum(0.0f, 800.0f, 0.0f, 600.0f, -100.0f, 100.0f);
-//		m_matProj = Mat4::makePerspective(45.0f, 4.0f / 3.0f, -10.0f, 10.0f);
-//		m_matProj.transPose();
-//		m_matModelView = Mat4::makeLookAt(0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		//把下面的0(1)换成1(0)可以切换两种视图
+#if 1
+		m_matProj = Mat4::makePerspective(M_PI / 4.0f, 4.0f / 3.0f, 1.0, 1000.0f);
+		m_matModelView = Mat4::makeLookAt(0.0f, 0.0f, 800.0f, 0.0f, 0.0f, -1000.0f, 0.0f, 1.0f, 0.0f);
+#else
+		m_matProj = Mat4::makeOrtho(-400.0f, 400.0f, -300.0f, 300.0f, -1.0f, 1.0f);
 		m_matModelView.loadIdentity();
-//		m_matModelView.transPose();
+#endif
 	}
 	~Object() {}
 
 	void render(float x, float y)
 	{
-		//moveto(x, y);
 		std::vector<Vec2f> vec;
+		Mat4 mvp = m_matProj * m_matModelView;
 		for(auto t = m_vec.begin(); t != m_vec.end(); ++t)
 		{
 			Vec2f coord;
-			Mat4::projectM4f(t->subvec(0, 1, 2), m_matModelView, m_matProj, coord, 800.0f, 600.0f);
+			Mat4::projectM4f(*t, mvp, coord, 800.0f, 600.0f);
 			vec.push_back(coord);
 		}
 
@@ -55,12 +56,12 @@ public:
 // 		}
 	}
 
-	void pushPoint(Vec4f pnt)
+	void pushPoint(Vec3f pnt)
 	{
 		m_vec.push_back(pnt);
 	}
 
-	void pushPoints(Vec4f* pnt, int n)
+	void pushPoints(Vec3f* pnt, int n)
 	{
 		for(int i = 0; i != n; ++i)
 		{
@@ -68,9 +69,9 @@ public:
 		}
 	}
 
-	void pushPoint(float x, float y, float z, float w)
+	void pushPoint(float x, float y, float z)
 	{
-		m_vec.push_back(Vec4f(x, y, z, w));
+		m_vec.push_back(Vec3f(x, y, z));
 	}
 
 	void rotate(float rad, float x, float y, float z)
@@ -101,28 +102,28 @@ public:
 	void clear() { m_vec.clear(); }
 
 private:
-	std::vector<Vec4f> m_vec;
+	std::vector<Vec3f> m_vec;
 	Mat4 m_matProj, m_matModelView;
 };
 
 void getObj(Object& obj, float scale)
 {
-	obj.pushPoint(-scale, -scale, 0.0f, 1.0f);
-	obj.pushPoint(scale, -scale, 0.0f, 1.0f);
-	obj.pushPoint(scale, scale, 0.0f, 1.0f);
-	obj.pushPoint(-scale, scale, 0.0f, 1.0f);
+	obj.pushPoint(-scale, -scale, 0.0f);
+	obj.pushPoint(scale, -scale, 0.0f);
+	obj.pushPoint(scale, scale, 0.0f);
+	obj.pushPoint(-scale, scale, 0.0f);
 }
 
 void getBox(Object& obj, float scale)
 {
-	obj.pushPoint(-scale, -scale, scale, 1.0f);
-	obj.pushPoint(scale, -scale, scale, 1.0f);
-	obj.pushPoint(scale, scale, scale, 1.0f);
-	obj.pushPoint(-scale, scale, scale, 1.0f);
-	obj.pushPoint(-scale, -scale, -scale, 1.0f);
-	obj.pushPoint(scale, -scale, -scale, 1.0f);
-	obj.pushPoint(scale, scale, -scale, 1.0f);
-	obj.pushPoint(-scale, scale, -scale, 1.0f);
+	obj.pushPoint(-scale, -scale, scale);
+	obj.pushPoint(scale, -scale, scale);
+	obj.pushPoint(scale, scale, scale);
+	obj.pushPoint(-scale, scale, scale);
+	obj.pushPoint(-scale, -scale, -scale);
+	obj.pushPoint(scale, -scale, -scale);
+	obj.pushPoint(scale, scale, -scale);
+	obj.pushPoint(-scale, scale, -scale);
 }
 
 #define RANDOM_SIGN (random(2) == 0 ? -1 : 1)
@@ -131,11 +132,8 @@ void getObject(Object& obj, float scale)
 {
 	for(int i = 0; i != 40; ++i)
 	{
-		obj.pushPoint(RANDOM_SIGN*randomf()*scale, RANDOM_SIGN*randomf()*scale, RANDOM_SIGN*randomf()*scale, 1.0f);
+		obj.pushPoint(RANDOM_SIGN*randomf()*scale, RANDOM_SIGN*randomf()*scale, RANDOM_SIGN*randomf()*scale);
 	}
-// 	obj.pushPoint(10000.0f, 0.0f, 0.0f, 1.0f);
-// 	obj.pushPoint(0.0f, 10000.0f, 0.0f, 1.0f);
-// 	obj.pushPoint(0.0f, 0.0f, 10000.0f, 1.0f);
 }
 
 
@@ -197,7 +195,7 @@ int main()
 		else cleardevice();
 		mouseFunc(obj);
 
-		obj.render(400, 300);
+		obj.render(0, 0);
 		outtextxy(20, 10, "点击空格键启用模糊滤镜,按回车随机生成模型");
 		setcolor(WHITE);
 		obj2.rotate(0.05f, radX, radY, radZ);

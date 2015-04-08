@@ -1,36 +1,38 @@
 //Author: wysaid
 //blog: http://blog.wysaid.org
 
-#include "htMat.h"
-#include "htVec.h"
+#include "cgeMat.h"
+#include "cgeVec.h"
 #include "graphics.h"
 #include <vector>
 #include "teapot.h"
 
-using namespace HTAlgorithm;
+using namespace CGE;
 
 class Object
 {
 public:
 	Object()
 	{
-		m_matProj = Mat4::makeOrtho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
-//		m_matProj = Mat4::makeFrustum(0.0f, 800.0f, 0.0f, 600.0f, -100.0f, 100.0f);
-//		m_matProj = Mat4::makePerspective(45.0f, 4.0f / 3.0f, -10.0f, 10.0f);
-//		m_matProj.transPose();
-//		m_matModelView = Mat4::makeLookAt(0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-//		m_matModelView.translate(-400, -150, -700);
-		m_matModelView.loadIdentity();
+		//把下面的0(1)换成1(0)可以切换两种视图
+#if 1
+ 		m_matProj = Mat4::makePerspective(M_PI / 4.0f, 4.0f / 3.0f, 1.0, 1000.0f);
+ 		m_matModelView = Mat4::makeLookAt(0.0f, 0.0f, 800.0f, 0.0f, 0.0f, -1000.0f, 0.0f, 1.0f, 0.0f);
+#else
+ 		m_matProj = Mat4::makeOrtho(-400.0f, 400.0f, -300.0f, 300.0f, -1.0f, 1.0f);
+ 		m_matModelView.loadIdentity();
+#endif
 	}
 	~Object() {}
 
 	void render(float x, float y)
 	{
 		std::vector<Vec2f> vec;
+		Mat4 mvp = m_matProj * m_matModelView;
 		for(auto t = m_vec.begin(); t != m_vec.end(); ++t)
 		{
 			Vec2f coord;
-			Mat4::projectM4f(*t, m_matModelView, m_matProj, coord, 800.0f, 600.0f);
+			Mat4::projectM4f(*t, mvp, coord, 800.0f, 600.0f);
 			vec.push_back(coord);
 		}
 
@@ -162,7 +164,7 @@ int main()
 		else cleardevice();
 		mouseFunc(obj);
 
-		obj.render(400, 300);
+		obj.render(0, 0);
 		outtextxy(20, 10, "点击空格键启用模糊滤镜,按回车随机生成模型，滚轮移动模型Z值");
 		
 		setcolor(HSVtoRGB(i*2, 1.0f, 1.0f));
