@@ -59,7 +59,7 @@
       <AdditionalIncludeDirectories>../algorithm;../3rdparty</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../3rdparty</AdditionalLibraryDirectories>
     </Link>

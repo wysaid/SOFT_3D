@@ -1,8 +1,6 @@
 //Author: wysaid
 //blog: http://blog.wysaid.org
 
-#define SHOW_CONSOLE
-
 #include "cgeMat.h"
 #include "cgeVec.h"
 #include "graphics.h"
