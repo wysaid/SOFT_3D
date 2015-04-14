@@ -14,6 +14,7 @@
     <ProjectGuid>{E22E488A-7EDD-412F-A2F2-FDD738B8A6A2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>EGETeapot</RootNamespace>
+    <ProjectName>EGETeapot</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -58,7 +59,7 @@
       <AdditionalIncludeDirectories>../algorithm;../3rdparty</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../3rdparty</AdditionalLibraryDirectories>
     </Link>
@@ -89,9 +90,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EGETeapot.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="teapot.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
