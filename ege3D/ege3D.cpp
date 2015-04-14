@@ -1,4 +1,4 @@
-//Author: wysaid
+ï»¿//Author: wysaid
 //blog: http://blog.wysaid.org
 
 #include "cgeMat.h"
@@ -13,7 +13,7 @@ class Object
 public:
 	Object()
 	{
-		//°ÑÏÂÃæµÄ0(1)»»³É1(0)¿ÉÒÔÇĞ»»Á½ÖÖÊÓÍ¼
+		//æŠŠä¸‹é¢çš„0(1)æ¢æˆ1(0)å¯ä»¥åˆ‡æ¢ä¸¤ç§è§†å›¾
 #if 1
 		m_matProj = Mat4::makePerspective(M_PI / 4.0f, 4.0f / 3.0f, 1.0, 1000.0f);
 		m_matModelView = Mat4::makeLookAt(0.0f, 0.0f, 800.0f, 0.0f, 0.0f, -1000.0f, 0.0f, 1.0f, 0.0f);
@@ -196,7 +196,7 @@ int main()
 		mouseFunc(obj);
 
 		obj.render(0, 0);
-		outtextxy(20, 10, "µã»÷¿Õ¸ñ¼üÆôÓÃÄ£ºıÂË¾µ,°´»Ø³µËæ»úÉú³ÉÄ£ĞÍ");
+		outtextxy(20, 10, "ç‚¹å‡»ç©ºæ ¼é”®å¯ç”¨æ¨¡ç³Šæ»¤é•œ,æŒ‰å›è½¦éšæœºç”Ÿæˆæ¨¡å‹");
 		setcolor(WHITE);
 		obj2.rotate(0.05f, radX, radY, radZ);
 

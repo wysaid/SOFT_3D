@@ -1,4 +1,4 @@
-//Author: wysaid
+ï»¿//Author: wysaid
 //blog: http://blog.wysaid.org
 
 #include "cgeMat.h"
@@ -22,7 +22,7 @@ color_t g_color;
 #define SCREEN_HEIGHT 600
 
 #if USE_DEPTH_TEST
-//depth »¹´æÔÚÒ»µãÎÊÌâ£¬ Ã»ÓĞĞ§¹û
+//depth è¿˜å­˜åœ¨ä¸€ç‚¹é—®é¢˜ï¼Œ æ²¡æœ‰æ•ˆæœ
 unsigned char g_depthMask[SCREEN_WIDTH][SCREEN_HEIGHT];
 const int g_maskSize = sizeof(g_depthMask);
 
@@ -105,7 +105,7 @@ private:
 
 #endif
 
-	// Æ½¶¥/Æ½µ×Èı½ÇĞÎ, v0[1] == v2[1], v1[1] ×î´ó
+	// å¹³é¡¶/å¹³åº•ä¸‰è§’å½¢, v0[1] == v2[1], v1[1] æœ€å¤§
 	static inline void _fillSimpleTriangle(const Type& v0, const Type& v1, const Type& v2)
 	{
 		assert(v0[1] == v2[1]);
@@ -114,11 +114,17 @@ private:
 		float dL = (v1[0] - v0[0]) / h;
 		float dR = (v1[0] - v2[0]) / h;
 
-		float dDepthL = (v1[2] - v0[2]) / h;
-		float dDepthR = (v1[2] - v2[2]) / h;
-
 		float xL = v0[0], xR = v2[0];
+
+#if USE_DEPTH_TEST
+
+		static_assert(Type::VEC_DIM >= 3, "Depth-Test is not available now!");
+
+		float dDepthL = (v1[2] - v0[2]) / h;
+		float dDepthR = (v1[2] - v2[2]) / h;		
 		float depthL = v0[2], depthR = v2[2];
+
+#endif
 
 		if(v0[1] < v1[1])
 		{
@@ -128,15 +134,15 @@ private:
 			{
 #if USE_DEPTH_TEST
 				drawLineL2R(xL, depthL, xR, depthR, i, RED);
+
+				depthL += dDepthL;
+				depthR += dDepthR;
 #else
 				line(xL, i, xR, i); //A Simple Function That Just Draw A Line
 #endif //USE_DEPTH_TEST
 
 				xL += dL;
 				xR += dR;
-
-				depthL += dDepthL;
-				depthR += dDepthR;
 			}
 #endif //RENDER_TRIANGLE_HALF_1
 		}
@@ -148,15 +154,14 @@ private:
 			{
 #if USE_DEPTH_TEST
 				drawLineL2R(xL, depthL, xR, depthR, i, YELLOW);
+				depthL -= dDepthL;
+				depthR -= dDepthR;
 #else
 				line(xL, i, xR, i); //A Simple Function That Just Draw A Line
 #endif //USE_DEPTH_TEST	
 
 				xL -= dL;
 				xR -= dR;
-
-				depthL -= dDepthL;
-				depthR -= dDepthR;
 			}
 
 #endif
@@ -192,10 +197,10 @@ class Object
 public:
 	Object()
 	{
-		//°ÑÏÂÃæµÄ0(1)»»³É1(0)¿ÉÒÔÇĞ»»Á½ÖÖÊÓÍ¼
+		//æŠŠä¸‹é¢çš„0(1)æ¢æˆ1(0)å¯ä»¥åˆ‡æ¢ä¸¤ç§è§†å›¾
 #if USE_PERSPECTIVE_PROJ
  		m_matProj = Mat4::makePerspective(M_PI / 4.0f, 4.0f / 3.0f, 1.0f, 1000.0f);
- 		m_matModelView = Mat4::makeLookAt(0.0f, 0.0f, 800.0f, 0.0f, 0.0f, -500.0f, 0.0f, 1.0f, 0.0f);
+ 		m_matModelView = Mat4::makeLookAt(0.0f, 0.0f, 800.0f, 0.0f, 0.0f, -1000.0f, 0.0f, 1.0f, 0.0f);
 #else
  		m_matProj = Mat4::makeOrtho(-400.0f, 400.0f, -300.0f, 300.0f, -300.0f, 300.0f);
  		m_matModelView.loadIdentity();
@@ -205,29 +210,29 @@ public:
 
 	void render(float x, float y)
 	{
-		std::vector<Vec3f> vec;
+		std::vector<Vec2f> vec;
 		const Mat4 mvp = m_matProj * m_matModelView;
 		const Vec4f viewPort(0.0f, 0.0f, 800.0f, 600.0f);
 		for(auto t = m_vec.begin(); t != m_vec.end(); ++t)
 		{
-			Vec3f coord;
+			Vec2f coord;
 			Mat4::projectM4f(*t, mvp, viewPort, coord);
 			//Mat4::projectM4fPerspective(*t, m_matModelView, m_matProj, viewPort, coord);
 			vec.push_back(coord);
 		}
 
-		for(int i = 0; i <= g_teapotIndicesNum; i += 3)
+		for(int i = 0; i < g_teapotIndicesNum; i += 3)
 		{
 			const int index1 = g_teapotIndices[i];
 			const int index2 = g_teapotIndices[i + 1];
 			const int index3 = g_teapotIndices[i + 2];
 			
-			const Vec3i polyPoints[] = {
-				Vec3i(x + vec[index1][0], y + vec[index1][1], vec[index1][2] * 255.0f),
-				Vec3i(x + vec[index2][0], y + vec[index2][1], vec[index2][2] * 255.0f),
-				Vec3i(x + vec[index3][0], y + vec[index3][1], vec[index3][2] * 255.0f) };
+			const Vec2i polyPoints[] = {
+				Vec2i(x + vec[index1][0], y + vec[index1][1]),// vec[index1][2] * 255.0f),
+				Vec2i(x + vec[index2][0], y + vec[index2][1]),// vec[index2][2] * 255.0f),
+				Vec2i(x + vec[index3][0], y + vec[index3][1]) }; // vec[index3][2] * 255.0f) };
 
-//ÉèÖÃÊÇ·ñÏÔÊ¾Ä£ÄâÌî³ä
+//è®¾ç½®æ˜¯å¦æ˜¾ç¤ºæ¨¡æ‹Ÿå¡«å……
 #if RENDER_TRIANGLE_HALF_1 || RENDER_TRIANGLE_HALF_2
 			
 			{
@@ -237,14 +242,14 @@ public:
 				float by = polyPoints[2][1] - polyPoints[1][1];
 				float zNorm = ax * by - ay * bx;
 
-				//±³ÃæÌŞ³ı
+				//èƒŒé¢å‰”é™¤
 				if(zNorm > 0.0f)
 				{
 					setcolor(g_color ^ 0xffffff);
 #if USE_DEPTH_TEST
 					memset(g_depthMask, 0, g_maskSize);
 #endif
-					Triangle<Vec3i>::fillTriangle(polyPoints[0], polyPoints[1], polyPoints[2]);
+					Triangle<Vec2i>::fillTriangle(polyPoints[0], polyPoints[1], polyPoints[2]);
 				}
 			}
 
@@ -387,7 +392,7 @@ int main()
 		obj.render(0, 0);
 
 		g_color = HSVtoRGB(i*2, 1.0f, 1.0f);
-		outtextxy(20, 10, "µã»÷¿Õ¸ñ¼üÆôÓÃÄ£ºıÂË¾µ, ¹öÂÖÒÆ¶¯Ä£ĞÍZÖµ");
+		outtextxy(20, 10, "ç‚¹å‡»ç©ºæ ¼é”®å¯ç”¨æ¨¡ç³Šæ»¤é•œ, æ»šè½®ç§»åŠ¨æ¨¡å‹Zå€¼");
 
 		x += dx;
 		y += dy;
