@@ -9,14 +9,17 @@
 
 using namespace CGE;
 
-#define USE_DEPTH_TEST 0
-#define USE_PERSPECTIVE_PROJ 1
+#define USE_DEPTH_TEST 0 //Must be 0
 
+//Change them as you like
+#define USE_PERSPECTIVE_PROJ 1
 #define RENDER_TRIANGLE_HALF_1 1
 #define RENDER_TRIANGLE_HALF_2 0
 
-color_t g_color;
+#define USE_CULL_FACE_BACK 1
+#define USE_CULL_FACE_FRONT 0
 
+color_t g_color;
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
@@ -212,7 +215,7 @@ public:
 	{
 		std::vector<Vec2f> vec;
 		const Mat4 mvp = m_matProj * m_matModelView;
-		const Vec4f viewPort(0.0f, 0.0f, 800.0f, 600.0f);
+		const Vec4f viewPort(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 		for(auto t = m_vec.begin(); t != m_vec.end(); ++t)
 		{
 			Vec2f coord;
@@ -230,30 +233,47 @@ public:
 			const Vec2i polyPoints[] = {
 				Vec2i(x + vec[index1][0], y + vec[index1][1]),// vec[index1][2] * 255.0f),
 				Vec2i(x + vec[index2][0], y + vec[index2][1]),// vec[index2][2] * 255.0f),
-				Vec2i(x + vec[index3][0], y + vec[index3][1]) }; // vec[index3][2] * 255.0f) };
+				Vec2i(x + vec[index3][0], y + vec[index3][1])  // vec[index3][2] * 255.0f)
+			};
 
-//设置是否显示模拟填充
+			//设置是否进行面剔除
+#if USE_CULL_FACE_BACK || USE_CULL_FACE_FRONT
+
+			float ax = polyPoints[1][0] - polyPoints[0][0];
+			float ay = polyPoints[1][1] - polyPoints[0][1];
+			float bx = polyPoints[2][0] - polyPoints[1][0];
+			float by = polyPoints[2][1] - polyPoints[1][1];
+			float zNorm = ax * by - ay * bx;
+#if USE_CULL_FACE_BACK
+			if(zNorm <= 0.0f)
+			{
+				goto Render_Wire_Frame;
+				//continue;
+			}
+#endif
+#if USE_CULL_FACE_FRONT
+			if(zNorm > 0.0f)
+			{
+				goto Render_Wire_Frame;
+				//continue;
+			}
+#endif
+
+#endif
+
+			//设置是否显示模拟填充
 #if RENDER_TRIANGLE_HALF_1 || RENDER_TRIANGLE_HALF_2
 			
-			{
-				float ax = polyPoints[1][0] - polyPoints[0][0];
-				float ay = polyPoints[1][1] - polyPoints[0][1];
-				float bx = polyPoints[2][0] - polyPoints[1][0];
-				float by = polyPoints[2][1] - polyPoints[1][1];
-				float zNorm = ax * by - ay * bx;
-
-				//背面剔除
-				if(zNorm > 0.0f)
-				{
-					setcolor(g_color ^ 0xffffff);
+			setcolor(g_color ^ 0xffffff);
 #if USE_DEPTH_TEST
-					memset(g_depthMask, 0, g_maskSize);
-#endif
-					Triangle<Vec2i>::fillTriangle(polyPoints[0], polyPoints[1], polyPoints[2]);
-				}
-			}
+			memset(g_depthMask, 0, g_maskSize);
+#endif //USE_DEPTH_TEST
+			Triangle<Vec2i>::fillTriangle(polyPoints[0], polyPoints[1], polyPoints[2]);
 
-#endif
+#endif //RENDER_TRIANGLE_HALF_1 || RENDER_TRIANGLE_HALF_2
+
+Render_Wire_Frame:
+
 			setcolor(g_color);
 			line(polyPoints[0][0], polyPoints[0][1], polyPoints[1][0], polyPoints[1][1]);
 			line(polyPoints[1][0], polyPoints[1][1], polyPoints[2][0], polyPoints[2][1]);
@@ -357,14 +377,6 @@ void getObj(Object& obj, float scale)
 		obj.pushPoint(g_teapotPositions[i] * 10.0f, g_teapotPositions[i + 1] * 10.0f, g_teapotPositions[i + 2] * 10.0f);
 	}
 }
-
-// template<class Type>
-// void drawTriangle(const Type& t0, const Type& t1, const Type& t2)
-// {
-// 	line(t0[0], t0[1], t1[0], t1[1]);
-// 	line(t2[0], t2[1], t1[0], t1[1]);
-// 	line(t0[0], t0[1], t2[0], t2[1]);
-// }
 
 int main()
 {
