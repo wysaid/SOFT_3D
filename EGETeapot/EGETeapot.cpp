@@ -224,13 +224,15 @@ public:
 			vec.push_back(coord);
 		}
 
+		vec.reserve(g_teapotIndicesNum);
+
 		for(int i = 0; i < g_teapotIndicesNum; i += 3)
 		{
 			const int index1 = g_teapotIndices[i];
 			const int index2 = g_teapotIndices[i + 1];
 			const int index3 = g_teapotIndices[i + 2];
 			
-			const Vec2i polyPoints[] = {
+			const Vec2i posPoints[] = {
 				Vec2i(x + vec[index1][0], y + vec[index1][1]),// vec[index1][2] * 255.0f),
 				Vec2i(x + vec[index2][0], y + vec[index2][1]),// vec[index2][2] * 255.0f),
 				Vec2i(x + vec[index3][0], y + vec[index3][1])  // vec[index3][2] * 255.0f)
@@ -239,10 +241,10 @@ public:
 			//设置是否进行面剔除
 #if USE_CULL_FACE_BACK || USE_CULL_FACE_FRONT
 
-			float ax = polyPoints[1][0] - polyPoints[0][0];
-			float ay = polyPoints[1][1] - polyPoints[0][1];
-			float bx = polyPoints[2][0] - polyPoints[1][0];
-			float by = polyPoints[2][1] - polyPoints[1][1];
+			float ax = posPoints[1][0] - posPoints[0][0];
+			float ay = posPoints[1][1] - posPoints[0][1];
+			float bx = posPoints[2][0] - posPoints[1][0];
+			float by = posPoints[2][1] - posPoints[1][1];
 			float zNorm = ax * by - ay * bx;
 #if USE_CULL_FACE_BACK
 			if(zNorm <= 0.0f)
@@ -268,16 +270,16 @@ public:
 #if USE_DEPTH_TEST
 			memset(g_depthMask, 0, g_maskSize);
 #endif //USE_DEPTH_TEST
-			Triangle<Vec2i>::fillTriangle(polyPoints[0], polyPoints[1], polyPoints[2]);
+			Triangle<Vec2i>::fillTriangle(posPoints[0], posPoints[1], posPoints[2]);
 
 #endif //RENDER_TRIANGLE_HALF_1 || RENDER_TRIANGLE_HALF_2
 
 Render_Wire_Frame:
 
 			setcolor(g_color);
-			line(polyPoints[0][0], polyPoints[0][1], polyPoints[1][0], polyPoints[1][1]);
-			line(polyPoints[1][0], polyPoints[1][1], polyPoints[2][0], polyPoints[2][1]);
-			line(polyPoints[2][0], polyPoints[2][1], polyPoints[0][0], polyPoints[0][1]);
+			line(posPoints[0][0], posPoints[0][1], posPoints[1][0], posPoints[1][1]);
+			line(posPoints[1][0], posPoints[1][1], posPoints[2][0], posPoints[2][1]);
+			line(posPoints[2][0], posPoints[2][1], posPoints[0][0], posPoints[0][1]);
 		}
 
 	}
