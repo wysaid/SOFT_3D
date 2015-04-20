@@ -19,8 +19,6 @@ using namespace CGE;
 #define USE_CULL_FACE_BACK 1
 #define USE_CULL_FACE_FRONT 0
 
-color_t g_color;
-
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
@@ -30,6 +28,8 @@ unsigned char g_depthMask[SCREEN_WIDTH][SCREEN_HEIGHT];
 const int g_maskSize = sizeof(g_depthMask);
 
 #endif
+
+color_t g_color;
 
 template<class Type>
 class Triangle
