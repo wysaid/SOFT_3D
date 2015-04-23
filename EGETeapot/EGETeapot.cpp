@@ -373,8 +373,8 @@ bool mouseFunc(Object& obj)
 
 void getObj(Object& obj, float scale)
 {
-	const int num = g_positionNum / 3;
-	for(int i = 0; i < g_positionNum; i += 3)
+	const int num = g_teapotPositionNum / 3;
+	for(int i = 0; i < g_teapotPositionNum; i += 3)
 	{
 		obj.pushPoint(g_teapotPositions[i] * 10.0f, g_teapotPositions[i + 1] * 10.0f, g_teapotPositions[i + 2] * 10.0f);
 	}
