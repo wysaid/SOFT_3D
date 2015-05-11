@@ -420,7 +420,7 @@ int main()
 		obj.render(0, 0);
 
 		g_color = HSVtoRGB(i*2, 1.0f, 1.0f);
-		//outtextxy(20, 10, "点击空格键启用模糊滤镜, 滚轮移动模型Z值");
+		outtextxy(20, 10, "点击空格键启用模糊滤镜, 鼠标滚轮移动模型Z值, enter键截屏");
 
 		x += dx;
 		y += dy;
