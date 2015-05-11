@@ -9,7 +9,7 @@
 
 using namespace CGE;
 
-#define USE_DEPTH_TEST 0 //Must be 0
+#define USE_DEPTH_TEST 0 //Not available, must be 0.
 
 //Change them as you like
 #define USE_PERSPECTIVE_PROJ 1
@@ -213,15 +213,16 @@ public:
 
 	void render(float x, float y)
 	{
-		std::vector<Vec2f> vec;
+		std::vector<Vec2f> vec(m_vecPositions.size());
 		const Mat4 mvp = m_matProj * m_matModelView;
 		const Vec4f viewPort(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
-		for(auto t = m_vec.begin(); t != m_vec.end(); ++t)
+		auto iter = vec.begin();
+		
+		for(auto& t : m_vecPositions)
 		{
 			Vec2f coord;
-			Mat4::projectM4f(*t, mvp, viewPort, coord);
-			//Mat4::projectM4fPerspective(*t, m_matModelView, m_matProj, viewPort, coord);
-			vec.push_back(coord);
+			Mat4::projectM4f(t, mvp, viewPort, coord);
+			*iter++ = coord;
 		}
 
 		vec.reserve(g_teapotIndicesNum);
@@ -286,20 +287,20 @@ Render_Wire_Frame:
 
 	void pushPoint(Vec3f pnt)
 	{
-		m_vec.push_back(pnt);
+		m_vecPositions.push_back(pnt);
 	}
 
 	void pushPoints(Vec3f* pnt, int n)
 	{
 		for(int i = 0; i != n; ++i)
 		{
-			m_vec.push_back(pnt[i]);
+			m_vecPositions.push_back(pnt[i]);
 		}
 	}
 
 	void pushPoint(float x, float y, float z)
 	{
-		m_vec.push_back(Vec3f(x, y, z));
+		m_vecPositions.push_back(Vec3f(x, y, z));
 	}
 
 	void rotate(float rad, float x, float y, float z)
@@ -327,10 +328,14 @@ Render_Wire_Frame:
 		m_matModelView.translateZ(z);
 	}
 
-	void clear() { m_vec.clear(); }
+	void clear() { m_vecPositions.clear(); }
+
+	std::vector<Vec3f>& getPositions() { return m_vecPositions; }
+	std::vector<int>& getIndices() { return m_vecIndices; }
 
 private:
-	std::vector<Vec3f> m_vec;
+	std::vector<Vec3f> m_vecPositions;
+	std::vector<int> m_vecIndices;
 	Mat4 m_matProj, m_matModelView;
 };
 
@@ -371,24 +376,33 @@ bool mouseFunc(Object& obj)
 	return true;
 }
 
-void getObj(Object& obj, float scale)
+void genTeapot(Object& obj, float scale)
 {
-	const int num = g_teapotPositionNum / 3;
+	auto& pos = obj.getPositions();
+	auto& indices = obj.getIndices();
+
+	pos.clear();
+	pos.reserve(g_teapotIndicesNum / 3);
+
 	for(int i = 0; i < g_teapotPositionNum; i += 3)
 	{
-		obj.pushPoint(g_teapotPositions[i] * 10.0f, g_teapotPositions[i + 1] * 10.0f, g_teapotPositions[i + 2] * 10.0f);
+		pos.push_back(Vec3f(g_teapotPositions[i] * scale, g_teapotPositions[i + 1] * scale, g_teapotPositions[i + 2] * scale));
 	}
+
+	indices.clear();
+	indices.assign(g_teapotIndices, g_teapotIndices + g_teapotIndicesNum);
 }
 
 int main()
 {
+	setinitmode(INIT_RENDERMANUAL);
 	initgraph(SCREEN_WIDTH, SCREEN_HEIGHT);
 	setrendermode(RENDER_MANUAL);
 
 	Object obj;
 	randomize();
 	
-	getObj(obj, 100);
+	genTeapot(obj, 10.0f);
 
 	int i = 0;
 	static bool s_useBlur = false;
@@ -399,14 +413,14 @@ int main()
 	setfillcolor(DARKGRAY);
 	for(; is_run(); delay_fps(60))
 	{
-		if(s_useBlur) imagefilter_blurring(0, 0x80, 0x100);
+		if(s_useBlur) imagefilter_blurring(0, 0x79, 0x100);
 		else cleardevice();
 		mouseFunc(obj);
 
 		obj.render(0, 0);
 
 		g_color = HSVtoRGB(i*2, 1.0f, 1.0f);
-		outtextxy(20, 10, "点击空格键启用模糊滤镜, 滚轮移动模型Z值");
+		//outtextxy(20, 10, "点击空格键启用模糊滤镜, 滚轮移动模型Z值");
 
 		x += dx;
 		y += dy;
@@ -421,10 +435,9 @@ int main()
 			dy = -dy;
 			y += dy;
 		}
-		if(++i > 360)
-		{
-			i = 0;
-		}
+
+		++i %= 360;
+
 		if(kbhit())
 		{
 			switch (getch())
@@ -432,10 +445,15 @@ int main()
 			case ' ':
 				s_useBlur = !s_useBlur;
 				break;
-			
+			case '\r':case '\n':
+				{
+					saveimage(NULL, "screen_shot.bmp");
+				}
+				break;
 			default:
 				break;
 			}
+			flushkey();
 		}
 	}
 	closegraph();
