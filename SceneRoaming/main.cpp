@@ -253,6 +253,42 @@ int main()
 		else if (keystate('S') || keystate(key_down))
 			scene.goBack(motion);
 
+		if (mousemsg())
+		{
+			static bool isMouseDown = false;
+			static Vec2f lastMousePos;
+			mouse_msg msg = getmouse();
+
+			switch (msg.msg)
+			{
+			case mouse_msg_down:
+					lastMousePos[0] = msg.x;
+					lastMousePos[1] = msg.y;
+					isMouseDown = true;
+				break;
+			case mouse_msg_up:
+					isMouseDown = false;	
+				break;
+			case mouse_msg_move:
+				if (isMouseDown)
+				{
+					Vec2f curr(msg.x, msg.y);
+					Vec2f delta = curr - lastMousePos;
+					scene.turn(delta[0] / 300.0f);
+					scene.lookUp(delta[1] / 300.0f);
+					lastMousePos = curr;
+				}
+				break;
+			case mouse_msg_wheel:
+				scene.lookIn(msg.wheel / 1000.0f);
+				scene.updatePerspective();
+				break;
+			default:
+				break;
+			}
+
+		}
+
 		scene.updateView();
 		
 		scene.render(viewPort);
