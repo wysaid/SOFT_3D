@@ -2,7 +2,7 @@
 * cgeScene.h
 *
 *  Created on: 2014-10-27
-*      Author: Wang Yang
+*      Author: wysaid
 *        Mail: admin@wysaid.org
 */
 
@@ -10,10 +10,54 @@
 #define _CGE_SCENE_H_
 
 #include "cgeMat.h"
-#include "cgeCommonDefine.h"
+#include <cassert>
 
 namespace CGE
 {
+#ifndef CGE_MIN
+
+	template<typename Type>
+	inline Type CGE_MIN(Type a, Type b)
+	{
+		return a < b ? a : b;
+	}
+
+#endif
+
+#ifndef CGE_MAX
+
+	template<typename Type>
+	inline Type CGE_MAX(Type a, Type b)
+	{
+		return a > b ? a : b;
+	}
+
+#endif
+
+#ifndef CGE_MID
+
+	template<typename Type>
+	inline Type CGE_MID(Type n, Type vMin, Type vMax)
+	{
+		if (n < vMin)
+			n = vMin;
+		else if (n > vMax)
+			n = vMax;
+		return n;
+	}
+
+#endif
+
+#ifndef CGE_MIX
+
+	template<typename OpType, typename MixType>
+	inline auto CGE_MIX(OpType a, OpType b, MixType value) -> decltype(a - a * value + b * value)
+	{
+		return a - a * value + b * value;
+	}
+
+#endif
+
 	//辅助类， 提供场景漫游公共方法以及参数
 	class SceneInterfaceHelper
 	{

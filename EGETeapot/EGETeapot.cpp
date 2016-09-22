@@ -1,11 +1,16 @@
-﻿//Author: wysaid
-//blog: http://blog.wysaid.org
+﻿/*
+*  Author: wysaid
+*    Mail: admin@wysaid.org
+*    Blog: http://blog.wysaid.org
+*/
 
 #include "cgeMat.h"
 #include "cgeVec.h"
 #include "graphics.h"
-#include <vector>
 #include "teapot.h"
+
+#include <vector>
+#include <cassert>
 
 using namespace CGE;
 
@@ -200,7 +205,7 @@ class Object
 public:
 	Object()
 	{
-		//把下面的0(1)换成1(0)可以切换两种视图
+		//改变 USE_PERSPECTIVE_PROJ 的值可以切换两种视图
 #if USE_PERSPECTIVE_PROJ
  		m_matProj = Mat4::makePerspective(M_PI / 4.0f, 4.0f / 3.0f, 1.0f, 1000.0f);
  		m_matModelView = Mat4::makeLookAt(0.0f, 0.0f, 800.0f, 0.0f, 0.0f, -1000.0f, 0.0f, 1.0f, 0.0f);

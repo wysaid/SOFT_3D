@@ -1,5 +1,8 @@
-﻿//Author: wysaid
-//blog: http://blog.wysaid.org
+﻿/*
+*  Author: wysaid
+*    Mail: admin@wysaid.org
+*    Blog: http://blog.wysaid.org
+*/
 
 #include "cgeMat.h"
 #include "cgeVec.h"
