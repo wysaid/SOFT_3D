@@ -232,6 +232,7 @@ namespace CGE
 		}	
 	};
 
+	// 使用笛卡尔坐标系来漫游， 使用 xOz 平面作为漫游地面, y正方向为向上方向, 其他部分与SceneInterface相同
 	class SceneInterfaceDescartes : public SceneInterfaceHelper
 	{
 	public:
