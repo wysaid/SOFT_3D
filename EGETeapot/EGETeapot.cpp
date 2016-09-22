@@ -200,10 +200,10 @@ private:
 	}
 };
 
-class Object
+class Object3d
 {
 public:
-	Object()
+	Object3d()
 	{
 		//改变 USE_PERSPECTIVE_PROJ 的值可以切换两种视图
 #if USE_PERSPECTIVE_PROJ
@@ -214,13 +214,13 @@ public:
  		m_matModelView.loadIdentity();
 #endif
 	}
-	~Object() {}
+	~Object3d() {}
 
 	void render(float x, float y)
 	{
 		m_winCoords.resize(m_vecPositions.size());
 		const Mat4 mvp = m_matProj * m_matModelView;
-		const Vec4f viewPort(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);		
+		const Vec4f viewPort(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 		auto iter = m_winCoords.begin();
 		
 		for(auto& t : m_vecPositions)
@@ -229,8 +229,6 @@ public:
 			Mat4::projectM4f(t, mvp, viewPort, coord);
 			*iter++ = coord;
 		}
-
-		m_winCoords.reserve(g_teapotIndicesNum);
 
 		for(int i = 0; i < g_teapotIndicesNum; i += 3)
 		{
@@ -347,7 +345,7 @@ private:
 };
 
 
-bool mouseFunc(Object& obj)
+bool mouseFunc(Object3d& obj)
 {
 	if(!mousemsg()) return false;
 	do
@@ -383,7 +381,7 @@ bool mouseFunc(Object& obj)
 	return true;
 }
 
-void genTeapot(Object& obj, float scale)
+void genTeapot(Object3d& obj, float scale)
 {
 	auto& pos = obj.getPositions();
 	auto& indices = obj.getIndices();
@@ -402,11 +400,9 @@ void genTeapot(Object& obj, float scale)
 
 int main()
 {
-	setinitmode(INIT_RENDERMANUAL);
-	initgraph(SCREEN_WIDTH, SCREEN_HEIGHT);
-	setrendermode(RENDER_MANUAL);
+	initgraph(SCREEN_WIDTH, SCREEN_HEIGHT, INIT_RENDERMANUAL);
 
-	Object obj;
+	Object3d obj;
 	randomize();
 	
 	genTeapot(obj, 10.0f);
