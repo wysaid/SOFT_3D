@@ -62,7 +62,7 @@ namespace CGE
 	class SceneInterfaceHelper
 	{
 	protected:
-		SceneInterfaceHelper() : m_eye(0.0f, 0.0f), m_lookDir(0.0f, 1000.0f), m_eyeZ(0.0f), m_lookZ(0.0f), m_dirLen(1000.0f), m_fovyRad(M_PI / 4.0f), m_zNear(1.0f), m_zFar(1e5f), m_upDirRot(0.0f) {}
+		SceneInterfaceHelper() : m_eye(0.0f, 0.0f), m_lookDir(0.0f, 1000.0f), m_eyeZ(0.0f), m_lookZ(0.0f), m_dirLen(1000.0f), m_fovyRad(M_PI / 4.0f), m_zNear(1.0f), m_zFar(1000.0f), m_upDirRot(0.0f) {}
 
 	public:
 
