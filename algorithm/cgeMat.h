@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 @Author: wysaid
 @Blog: blog.wysaid.org
 @Date: 2013-10-31
@@ -16,7 +16,7 @@
 #include "cgeVec.h"
 
 #ifndef M_PI
-#define M_PI 3.1415926589793f
+#define M_PI 3.141592653589793f
 #endif
 
 namespace CGE
@@ -242,17 +242,17 @@ namespace CGE
 
 		inline void rotateX(float rad)
 		{
-			*this *= makeXRotation(rad); //´ıÓÅ»¯
+			*this *= makeXRotation(rad); //å¾…ä¼˜åŒ–
 		}
 
 		inline void rotateY(float rad)
 		{
-			*this *= makeYRotation(rad); //´ıÓÅ»¯
+			*this *= makeYRotation(rad); //å¾…ä¼˜åŒ–
 		}
 
 		inline void rotateZ(float rad)
 		{
-			*this *= makeZRotation(rad); //´ıÓÅ»¯
+			*this *= makeZRotation(rad); //å¾…ä¼˜åŒ–
 		}
 
 		inline void loadIdentity()
@@ -265,7 +265,7 @@ namespace CGE
 
 	struct Mat4
 	{
-		const static Mat4& makeIdentity()
+		const static inline Mat4& makeIdentity()
 		{
 			const static Mat4 sIdentity =  Mat4(1.0f, 0.0f, 0.0f, 0.0f,
 				0.0f, 1.0f, 0.0f, 0.0f,
@@ -722,10 +722,10 @@ namespace CGE
 
 		Mat4(Vec4f row0, Vec4f row1, Vec4f row2, Vec4f row3)
 		{
-			makeMatrix(*this, row0.x(), row0.y(), row0.z(), row0.w(),
-				row1.x(), row1.y(), row1.z(), row1.w(),
-				row2.x(), row2.y(), row2.z(), row2.w(),
-				row3.x(), row3.y(), row3.z(), row3.w());
+			makeMatrix(*this, row0[0], row0[1], row0[2], row0[3],
+				row1[0], row1[1], row1[2], row1[3],
+				row2[0], row2[1], row2[2], row2[3],
+				row3[0], row3[1], row3[2], row3[3]);
 		}
 
 		Mat4(Mat3& m, float v)
@@ -809,7 +809,7 @@ namespace CGE
 				data[0][3] * m[3][0] + data[1][3] * m[3][1] + data[2][3] * m[3][2] + data[3][3] * m[3][3]);
 		}
 
-		//ÌØÊâÓÃ·¨£¬ ½«mat3 Ö±½Ó×ª»»Îªmat4 ²¢ÓëÖ®Ïà³Ë¡£
+		//ç‰¹æ®Šç”¨æ³•ï¼Œ å°†mat3 ç›´æ¥è½¬æ¢ä¸ºmat4 å¹¶ä¸ä¹‹ç›¸ä¹˜ã€‚
 		inline Mat4 operator*(const Mat3& m) const
 		{
 			return Mat4(data[0][0] * m[0][0] + data[1][0] * m[0][1] + data[2][0] * m[0][2],
@@ -986,17 +986,17 @@ namespace CGE
 
 		inline void rotateX(float rad)
 		{
-			*this *= makeXRotation(rad); //´ıÓÅ»¯
+			*this *= makeXRotation(rad);
 		}
 
 		inline void rotateY(float rad)
 		{
-			*this *= makeYRotation(rad); //´ıÓÅ»¯
+			*this *= makeYRotation(rad);
 		}
 
 		inline void rotateZ(float rad)
 		{
-			*this *= makeZRotation(rad); //´ıÓÅ»¯
+			*this *= makeZRotation(rad);
 		}
 
 		inline Mat3 toMat3()
