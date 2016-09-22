@@ -218,10 +218,10 @@ public:
 
 	void render(float x, float y)
 	{
-		std::vector<Vec2f> vec(m_vecPositions.size());
+		m_winCoords.resize(m_vecPositions.size());
 		const Mat4 mvp = m_matProj * m_matModelView;
-		const Vec4f viewPort(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
-		auto iter = vec.begin();
+		const Vec4f viewPort(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);		
+		auto iter = m_winCoords.begin();
 		
 		for(auto& t : m_vecPositions)
 		{
@@ -230,7 +230,7 @@ public:
 			*iter++ = coord;
 		}
 
-		vec.reserve(g_teapotIndicesNum);
+		m_winCoords.reserve(g_teapotIndicesNum);
 
 		for(int i = 0; i < g_teapotIndicesNum; i += 3)
 		{
@@ -239,9 +239,9 @@ public:
 			const int index3 = g_teapotIndices[i + 2];
 			
 			const Vec2i posPoints[] = {
-				Vec2i(x + vec[index1][0], y + vec[index1][1]),// vec[index1][2] * 255.0f),
-				Vec2i(x + vec[index2][0], y + vec[index2][1]),// vec[index2][2] * 255.0f),
-				Vec2i(x + vec[index3][0], y + vec[index3][1])  // vec[index3][2] * 255.0f)
+				Vec2i(x + m_winCoords[index1][0], y + m_winCoords[index1][1]),// vec[index1][2] * 255.0f),
+				Vec2i(x + m_winCoords[index2][0], y + m_winCoords[index2][1]),// vec[index2][2] * 255.0f),
+				Vec2i(x + m_winCoords[index3][0], y + m_winCoords[index3][1])  // vec[index3][2] * 255.0f)
 			};
 
 			//设置是否进行面剔除
@@ -342,6 +342,8 @@ private:
 	std::vector<Vec3f> m_vecPositions;
 	std::vector<int> m_vecIndices;
 	Mat4 m_matProj, m_matModelView;
+
+	std::vector<Vec2f> m_winCoords;
 };
 
 
