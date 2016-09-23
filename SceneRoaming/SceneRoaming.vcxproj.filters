@@ -19,4 +19,18 @@
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\algorithm\cgeMat.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\algorithm\cgeScene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\algorithm\cgeStaticAssert.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\algorithm\cgeVec.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
