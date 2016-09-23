@@ -527,7 +527,7 @@ namespace CGE
 			fTempo[6]=proj[0][2]*fTempo[0]+proj[1][2]*fTempo[1]+proj[2][2]*fTempo[2]+proj[3][2]*fTempo[3];
 			fTempo[7]=-fTempo[2];
 			//The result normalizes between -1 and 1
-			if(fTempo[7]==0.0f)	//The w value
+			if(fTempo[7]<=0.0f)	//The w value
 				return false;
 			fTempo[7]=1.0f/fTempo[7];
 			//Perspective division
@@ -559,7 +559,7 @@ namespace CGE
 			fTempo[6]=proj[0][2]*fTempo[0]+proj[1][2]*fTempo[1]+proj[2][2]*fTempo[2]+proj[3][2]*fTempo[3];
 			fTempo[7]=-fTempo[2];
 			//The result normalizes between -1 and 1
-			if(fTempo[7]==0.0f)	//The w value
+			if(fTempo[7]<=0.0f)	//The w value
 				return false;
 			fTempo[7]=1.0f/fTempo[7];
 			//Perspective division
@@ -577,7 +577,7 @@ namespace CGE
 		{
 			Vec4f result = (modelView * Vec4f(obj[0], obj[1], obj[2], 1.0f)) * proj;
 
-			if (result[3] == 0.0f)
+			if (result[3] <= 0.0f)
 				return false;
 
 			result[0] /= result[3];
@@ -595,7 +595,7 @@ namespace CGE
 		{
 			Vec4f result = (modelView * Vec4f(obj[0], obj[1], obj[2], 1.0f)) * proj;
 
-			if (result[3] == 0.0f)
+			if (result[3] <= 0.0f)
 				return false;
 
 			result[0] /= result[3];
@@ -611,7 +611,7 @@ namespace CGE
 		{
 			Vec4f result = (modelView * Vec4f(obj[0], obj[1], 0.0f, 1.0f)) * proj;
 
-			if (result[3] == 0.0f)
+			if (result[3] <= 0.0f)
 				return false;
 
 			result[0] /= result[3];
@@ -627,7 +627,7 @@ namespace CGE
 		{
 			Vec4f result = modelViewProjection * Vec4f(obj[0], obj[1], obj[2], 1.0f);
 
-			if (result[3] == 0.0f)
+			if (result[3] <= 0.0f)
 				return false;
 
 			result[0] /= result[3];
@@ -645,7 +645,7 @@ namespace CGE
 		{
 			Vec4f result = modelViewProjection * Vec4f(obj[0], obj[1], obj[2], 1.0f);
 
-			if (result[3] == 0.0f)
+			if (result[3] <= 0.0f)
 				return false;
 
 			result[0] /= result[3];
@@ -661,7 +661,7 @@ namespace CGE
 		{
 			Vec4f result = (modelView * Vec4f(obj[0], obj[1], obj[2], 1.0f)) * proj;
 
-			if (result[3] == 0.0f)
+			if (result[3] <= 0.0f)
 				return false;
 
 			result[0] /= result[3];
@@ -677,7 +677,7 @@ namespace CGE
 		{
 			Vec4f result = mvp * Vec4f(obj[0], obj[1], obj[2], 1.0f);
 
-			if (result[3] == 0.0f)
+			if (result[3] <= 0.0f)
 				return false;
 
 			result[0] /= result[3];

@@ -22,7 +22,8 @@ template<class T>
 static inline void line(T p1, T p2)
 {
 	//3d坐标系与窗口坐标系y方向相反
-	line((int)p1[0], SCREEN_HEIGHT - (int)p1[1], (int)p2[0], SCREEN_HEIGHT - (int)p2[1]);
+	//使用 height - y 来修正.
+	line(p1[0], SCREEN_HEIGHT - p1[1], p2[0], SCREEN_HEIGHT - p2[1]);
 }
 
 class Object3d
@@ -35,7 +36,7 @@ public:
 
 	CREATE_FUNC(Object3d)
 
-	virtual void render(const Mat4& sceneMatrix, const Vec4f& viewPort) const
+	virtual void render(const Mat4& mvp, const Vec4f& viewPort) const
 	{
 
 	}
@@ -77,7 +78,7 @@ public:
 
 	void render(const Vec4f& viewPort) const
 	{
-		Mat4&& mvp = m_projectionMatrix * m_modelViewMatrix;
+		const Mat4& mvp = m_projectionMatrix * m_modelViewMatrix;
 
 		for (auto* v : m_vecObjects)
 		{
@@ -123,18 +124,17 @@ public:
 		return m;
 	}	
 
-	void render(const Mat4& sceneMatrix, const Vec4f& viewPort) const
+	virtual void render(const Mat4& mvp, const Vec4f& viewPort) const
 	{
 		m_winCoords.resize(m_vecPositions.size());
-//		const Mat4& mvp = Mat4::makePerspective(M_PI / 4.0f, 4.0f / 3.0f, 1.0f, 1000.0f) * Mat4::makeLookAt(0.0f, 0.0f, 800.0f, 0.0f, 0.0f, -1000.0f, 0.0f, 1.0f, 0.0f) * m_matrix;
-
-		const Mat4& mvp = sceneMatrix * m_matrix;
-
 		auto winIter = m_winCoords.begin();
+		memset(m_winCoords.data(), 0xff, m_winCoords.size() * sizeof(m_winCoords[0]));
+
+		const Mat4& m = mvp * m_matrix;
 
 		for (auto& pos : m_vecPositions)
 		{
-			Mat4::projectM4f(pos, mvp, viewPort, *winIter++);
+			Mat4::projectM4f(pos, m, viewPort, *winIter++);
 		}
 
 		const int w = m_width - 1;
@@ -157,48 +157,16 @@ public:
 				const auto& v3 = m_winCoords[nextLineIndex + 1];
 				const auto& v4 = m_winCoords[nextLineIndex];
 
-// 				if(v1[2] > 1.0 || v1[2] < 0.0)
-// 					continue;
-
-				//printf("ddd %f\n", v1[2]);
-
-				const float ax = v2[0] - v1[0];
-				const float ay = v2[1] - v1[1];
-				const float bx = v4[0] - v2[0];
-				const float by = v4[1] - v2[1];
-				const float zNorm = ax * by - ay * bx;
-
-				if (zNorm > 0.0f)
+				//Clip for perspective projection.
+				if ((int&)v1[0] != 0xffffffff && (int&)v4[1] != 0xffffffff)
 				{
 					line(v1, v2);
-
-					//小优化， 避免部分重复绘制
-					if (k == h || j + 1 == w)
-					{
-						line(v2, v3);
-						line(v3, v4);
-					}
+					line(v2, v3);
+					line(v3, v4);
 					line(v4, v1);
 				}
 			}
 		}
-
-// 		const int lastLine = h * m_width;
-// 		const auto& rightBottom = m_winCoords[w];
-// 		const auto& rightTop = m_winCoords[lastLine + w]; 
-// 		const auto& leftTop = m_winCoords[lastLine];
-// 
-// 		const float ax = rightTop[0] - rightBottom[0];
-// 		const float ay = rightTop[1] - rightBottom[1];
-// 		const float bx = leftTop[0] - rightTop[0];
-// 		const float by = leftTop[1] - rightTop[1];
-// 		const float zNorm = ax * by - ay * bx;
-// 		
-// 		if (zNorm > 0.0f)
-// 		{
-// 			line(leftTop, rightTop);
-// 			line(rightBottom, rightTop);
-// 		}
 	}
 
 protected:
@@ -222,19 +190,22 @@ Mesh* getMesh(int w, int h, const Vec3f& rot, const Vec3f& scaling)
 int main()
 {
 	initgraph(SCREEN_WIDTH, SCREEN_HEIGHT, INIT_RENDERMANUAL);
+	setcaption("Soft Scene Roaming by wysaid.");
  	setbkmode(TRANSPARENT);
+	setfillcolor(DARKGRAY);
 
 	Scene scene(SCREEN_WIDTH, SCREEN_HEIGHT);
-	const Vec4f viewPort(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	Mesh* m = getMesh(15, 15, Vec3f(0.0f, 0.0f, 0.0f), Vec3f(1500.0f, 1500.0f, 1500.0f));
+	const Vec4f viewPort(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
+	Mesh* m = getMesh(15, 15, Vec3f(0.0f, 0.0f, 0.0f), Vec3f(2000.0f, 2000.0f, 2000.0f));
 
 	const float motion = 5.0f;
+	const float standupHeight = 120.0f;
 
 	scene.addObject(m);
 
 	scene.setEyeXY(Vec2f(0.0f, 1000.0f));
-	scene.setEyeZ(100.0f); // 站立观察高度
+	scene.setEyeZ(standupHeight); // 站立观察高度
 	scene.setLookdirXY(Vec2f(0.0f, -1000.0f));
 	scene.updatePerspective();
 	scene.updateView();
@@ -253,7 +224,24 @@ int main()
 		else if (keystate('S') || keystate(key_down))
 			scene.goBack(motion);
 
-		if (mousemsg())
+		while (kbhit())
+		{
+			static bool isJumping = false;
+
+			if (isJumping)
+			{
+				scene.setEyeZ(scene.eyeZ() - 10.0f);
+				if (scene.eyeZ() < standupHeight)
+				{
+					scene.setEyeZ(standupHeight);
+					isJumping = false;
+				}
+			}
+
+
+		}
+
+		while (mousemsg())
 		{
 			static bool isMouseDown = false;
 			static Vec2f lastMousePos;
@@ -274,13 +262,13 @@ int main()
 				{
 					Vec2f curr(msg.x, msg.y);
 					Vec2f delta = curr - lastMousePos;
-					scene.turn(delta[0] / 300.0f);
-					scene.lookUp(delta[1] / 300.0f);
+					scene.turn(delta[0] / 600.0f);
+					scene.lookUp(delta[1] / 600.0f);
 					lastMousePos = curr;
 				}
 				break;
 			case mouse_msg_wheel:
-				scene.lookIn(msg.wheel / 1000.0f);
+				scene.lookIn(msg.wheel / 2000.0f);
 				scene.updatePerspective();
 				break;
 			default:
