@@ -1,4 +1,4 @@
-/*
+﻿/*
 @Author: wysaid
 @Blog: blog.wysaid.org
 @Date: 2013-10-31
@@ -6,8 +6,6 @@
 
 #ifndef _CGE_STATICASSERT_H_
 #define _CGE_STATICASSERT_H_
-
-#include <cassert>
 
 #ifndef _CGE_STATIC_ASSERT_
 
@@ -18,19 +16,19 @@
 #if defined(DEBUG) || defined(_DEBUG)
 
 template<bool K>
-struct CGEStaticAssert_ ;
+struct _CGEStaticAssert ;
 
 template<>
-struct CGEStaticAssert_<true> { int dummy; };
+struct _CGEStaticAssert<true> { int dummy; };
 
 template<int n>
-struct CGEStaticAssert {};
+struct __CGEStaticAssert {};
 
 #define cgeStaticAssert(value) do \
 {\
-	typedef CGEStaticAssert<\
-	sizeof(CGEStaticAssert_<(bool)(value)>)\
-	> CGEStaticAssert__;\
+	typedef __CGEStaticAssert<\
+	sizeof(_CGEStaticAssert<(bool)(value)>)\
+	> ___CGEStaticAssert;\
 } while (0)
 
 #else

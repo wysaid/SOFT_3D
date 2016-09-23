@@ -1,11 +1,16 @@
-﻿//Author: wysaid
-//blog: http://blog.wysaid.org
+﻿/*
+*  Author: wysaid
+*    Mail: admin@wysaid.org
+*    Blog: http://blog.wysaid.org
+*/
 
 #include "cgeMat.h"
 #include "cgeVec.h"
 #include "graphics.h"
-#include <vector>
 #include "teapot.h"
+
+#include <vector>
+#include <cassert>
 
 using namespace CGE;
 
@@ -195,12 +200,12 @@ private:
 	}
 };
 
-class Object
+class Object3d
 {
 public:
-	Object()
+	Object3d()
 	{
-		//把下面的0(1)换成1(0)可以切换两种视图
+		//改变 USE_PERSPECTIVE_PROJ 的值可以切换两种视图
 #if USE_PERSPECTIVE_PROJ
  		m_matProj = Mat4::makePerspective(M_PI / 4.0f, 4.0f / 3.0f, 1.0f, 1000.0f);
  		m_matModelView = Mat4::makeLookAt(0.0f, 0.0f, 800.0f, 0.0f, 0.0f, -1000.0f, 0.0f, 1.0f, 0.0f);
@@ -209,14 +214,14 @@ public:
  		m_matModelView.loadIdentity();
 #endif
 	}
-	~Object() {}
+	~Object3d() {}
 
 	void render(float x, float y)
 	{
-		std::vector<Vec2f> vec(m_vecPositions.size());
+		m_winCoords.resize(m_vecPositions.size());
 		const Mat4 mvp = m_matProj * m_matModelView;
 		const Vec4f viewPort(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
-		auto iter = vec.begin();
+		auto iter = m_winCoords.begin();
 		
 		for(auto& t : m_vecPositions)
 		{
@@ -225,8 +230,6 @@ public:
 			*iter++ = coord;
 		}
 
-		vec.reserve(g_teapotIndicesNum);
-
 		for(int i = 0; i < g_teapotIndicesNum; i += 3)
 		{
 			const int index1 = g_teapotIndices[i];
@@ -234,9 +237,9 @@ public:
 			const int index3 = g_teapotIndices[i + 2];
 			
 			const Vec2i posPoints[] = {
-				Vec2i(x + vec[index1][0], y + vec[index1][1]),// vec[index1][2] * 255.0f),
-				Vec2i(x + vec[index2][0], y + vec[index2][1]),// vec[index2][2] * 255.0f),
-				Vec2i(x + vec[index3][0], y + vec[index3][1])  // vec[index3][2] * 255.0f)
+				Vec2i(x + m_winCoords[index1][0], y + m_winCoords[index1][1]),// vec[index1][2] * 255.0f),
+				Vec2i(x + m_winCoords[index2][0], y + m_winCoords[index2][1]),// vec[index2][2] * 255.0f),
+				Vec2i(x + m_winCoords[index3][0], y + m_winCoords[index3][1])  // vec[index3][2] * 255.0f)
 			};
 
 			//设置是否进行面剔除
@@ -337,10 +340,12 @@ private:
 	std::vector<Vec3f> m_vecPositions;
 	std::vector<int> m_vecIndices;
 	Mat4 m_matProj, m_matModelView;
+
+	std::vector<Vec2f> m_winCoords;
 };
 
 
-bool mouseFunc(Object& obj)
+bool mouseFunc(Object3d& obj)
 {
 	if(!mousemsg()) return false;
 	do
@@ -376,7 +381,7 @@ bool mouseFunc(Object& obj)
 	return true;
 }
 
-void genTeapot(Object& obj, float scale)
+void genTeapot(Object3d& obj, float scale)
 {
 	auto& pos = obj.getPositions();
 	auto& indices = obj.getIndices();
@@ -395,11 +400,9 @@ void genTeapot(Object& obj, float scale)
 
 int main()
 {
-	setinitmode(INIT_RENDERMANUAL);
-	initgraph(SCREEN_WIDTH, SCREEN_HEIGHT);
-	setrendermode(RENDER_MANUAL);
+	initgraph(SCREEN_WIDTH, SCREEN_HEIGHT, INIT_RENDERMANUAL);
 
-	Object obj;
+	Object3d obj;
 	randomize();
 	
 	genTeapot(obj, 10.0f);

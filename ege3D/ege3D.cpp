@@ -1,5 +1,8 @@
-﻿//Author: wysaid
-//blog: http://blog.wysaid.org
+﻿/*
+*  Author: wysaid
+*    Mail: admin@wysaid.org
+*    Blog: http://blog.wysaid.org
+*/
 
 #include "cgeMat.h"
 #include "cgeVec.h"
@@ -8,10 +11,10 @@
 
 using namespace CGE;
 
-class Object
+class Object3d
 {
 public:
-	Object()
+	Object3d()
 	{
 		//把下面的0(1)换成1(0)可以切换两种视图
 #if 1
@@ -22,7 +25,7 @@ public:
 		m_matModelView.loadIdentity();
 #endif
 	}
-	~Object() {}
+	~Object3d() {}
 
 	void render(float x, float y)
 	{
@@ -106,7 +109,7 @@ private:
 	Mat4 m_matProj, m_matModelView;
 };
 
-void getObj(Object& obj, float scale)
+void getObj(Object3d& obj, float scale)
 {
 	obj.pushPoint(-scale, -scale, 0.0f);
 	obj.pushPoint(scale, -scale, 0.0f);
@@ -114,7 +117,7 @@ void getObj(Object& obj, float scale)
 	obj.pushPoint(-scale, scale, 0.0f);
 }
 
-void getBox(Object& obj, float scale)
+void getBox(Object3d& obj, float scale)
 {
 	obj.pushPoint(-scale, -scale, scale);
 	obj.pushPoint(scale, -scale, scale);
@@ -128,7 +131,7 @@ void getBox(Object& obj, float scale)
 
 #define RANDOM_SIGN (random(2) == 0 ? -1 : 1)
 
-void getObject(Object& obj, float scale)
+void getObject(Object3d& obj, float scale)
 {
 	for(int i = 0; i != 40; ++i)
 	{
@@ -137,7 +140,7 @@ void getObject(Object& obj, float scale)
 }
 
 
-bool mouseFunc(Object& obj)
+bool mouseFunc(Object3d& obj)
 {
 	if(!mousemsg()) return false;
 	do
@@ -177,8 +180,8 @@ int main()
 {
 	initgraph(800, 600);
 	setrendermode(RENDER_MANUAL);
-	Object obj;
-	Object obj2;
+	Object3d obj;
+	Object3d obj2;
 	getObject(obj, 300.0f);
 	getBox(obj2, 50.0f);
 	randomize();
