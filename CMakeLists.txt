@@ -17,14 +17,6 @@ endif ()
 
 project(ege-demos LANGUAGES CXX)
 
-add_library(ege-common INTERFACE)
-target_include_directories(ege-common INTERFACE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/ege/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/algorithm
-    ${CMAKE_CURRENT_SOURCE_DIR}/model)
-
-# 设置静态库搜索路径
-
 if (MSVC)
     
     # 设置 MSVC 编译选项, 当版本大于 vs2019 时, 使用 c++17 标准.
@@ -78,8 +70,6 @@ if (MSVC)
     else ()
         message(FATAL_ERROR "你的 MSVC 版本太老了, 请使用 vs2015 或更新版本的 MSVC 编译器. 与时俱进吧, 不要一直使用十年前的编译器.")
     endif ()
-
-    target_compile_options(ege-common INTERFACE /source-charset:utf-8 /MP ${CPP_COMPILE_OPTIONS} /D_USE_MATH_DEFINES /D__STDC_LIMIT_MACROS "$<$<CONFIG:DEBUG>:/DDEBUG>" "$<$<CONFIG:RELEASE>:/DNDEBUG>" "$<$<CONFIG:RELWITHDEBINFO>:/DNDEBUG>" "$<$<CONFIG:MINSIZEREL>:/DNDEBUG>" "$<IF:$<CONFIG:Debug>,/MDd,/MD>")
 endif ()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -88,22 +78,36 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     else ()
         set(osLibDir "mingw-w64-debian")
     endif ()
-    target_compile_options(ege-common INTERFACE -D_FORTIFY_SOURCE=0)
-    target_link_options(ege-common INTERFACE -mwindows -static -static-libgcc -static-libstdc++)
-    target_link_libraries(ege-common INTERFACE graphics gdiplus gdi32 imm32 msimg32 ole32 oleaut32 winmm uuid)
 endif ()
 
 if (DEFINED osLibDir)
-    message(STATUS "osLibDir: ${osLibDir}")
-    target_link_directories(ege-common INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/ege/lib/${osLibDir})
+    message(STATUS "osLibDir: ${osLibDir}")    
 endif ()
 
+function(set_ege_target_properties target)
+    target_link_directories(${target} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ege/lib/${osLibDir})
+
+    target_include_directories(${target} PRIVATE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/ege/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/algorithm
+        ${CMAKE_CURRENT_SOURCE_DIR}/model)
+
+
+    if (MSVC)
+        target_compile_options(${target} PRIVATE /source-charset:utf-8 /MP ${CPP_COMPILE_OPTIONS} /D_USE_MATH_DEFINES /D__STDC_LIMIT_MACROS "$<$<CONFIG:DEBUG>:/DDEBUG>" "$<$<CONFIG:RELEASE>:/DNDEBUG>" "$<$<CONFIG:RELWITHDEBINFO>:/DNDEBUG>" "$<$<CONFIG:MINSIZEREL>:/DNDEBUG>" "$<IF:$<CONFIG:Debug>,/MDd,/MD>")
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        target_compile_options(${target} PRIVATE -D_FORTIFY_SOURCE=0)
+        target_link_options(${target} PRIVATE -mwindows -static -static-libgcc -static-libstdc++)
+        target_link_libraries(${target} PRIVATE graphics gdiplus gdi32 imm32 msimg32 ole32 oleaut32 winmm uuid)
+    endif ()
+    
+endfunction()
 
 add_executable(demo-Lines demo-Lines.cpp)
-target_link_libraries(demo-Lines ege-common)
+set_ege_target_properties(demo-Lines)
 
 add_executable(demo-Teapot demo-Teapot.cpp)
-target_link_libraries(demo-Teapot ege-common)
+set_ege_target_properties(demo-Teapot)
 
 add_executable(demo-SceneRoaming demo-SceneRoaming.cpp)
-target_link_libraries(demo-SceneRoaming ege-common)
+set_ege_target_properties(demo-SceneRoaming)
