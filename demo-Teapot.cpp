@@ -4,9 +4,10 @@
 *    Blog: http://blog.wysaid.org
 */
 
+#include "graphics.h"
 #include "cgeMat.h"
 #include "cgeVec.h"
-#include "graphics.h"
+
 #include "teapot.h"
 
 #include <vector>

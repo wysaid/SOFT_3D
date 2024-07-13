@@ -6,9 +6,9 @@
 
 #define SHOW_CONSOLE
 #define _CRT_SECURE_NO_WARNINGS
+#include "graphics.h"
 #include "cgeScene.h"
 #include "cgeMat.h"
-#include "graphics.h"
 #include <vector>
 
 using namespace CGE;
