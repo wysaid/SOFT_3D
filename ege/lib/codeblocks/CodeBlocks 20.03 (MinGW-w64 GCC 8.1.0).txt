@@ -1,0 +1,6 @@
+Code Blocks 20.03 (64 bit version)---Compiler:MinGW-w64 GCC 8.1.0 x86_64-posix-seh
+https://sourceforge.net/projects/codeblocks/files/Binaries/20.03/Windows/codeblocks-20.03mingw-setup.exe/download
+
+
+Code Blocks 20.03 (32 bit version)---Compiler:MinGW-w64 GCC 8.1.0 x86_64-posix-seh
+https://sourceforge.net/projects/codeblocks/files/Binaries/20.03/Windows/32bit/codeblocks-20.03-32bit-mingw-64bit-setup.exe/download

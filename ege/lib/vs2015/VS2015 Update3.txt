@@ -1,0 +1,6 @@
+Visual Studio Community 2015 with Update 3 (x86 and x64) - DVD (Chinese-Simplified)
+http://download.microsoft.com/download/5/d/1/5d1ec81e-bc59-448f-9ab6-27636d5cc18a/vs2015.3.com_chs.iso
+
+
+Visual Studio Community 2015 with Update 3 (x86 and x64) - DVD (English)
+http://download.microsoft.com/download/b/e/d/bedddfc4-55f4-4748-90a8-ffe38a40e89f/vs2015.3.com_enu.iso
