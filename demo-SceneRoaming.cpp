@@ -1,4 +1,4 @@
-/*
+ï»¿/*
 *  Author: wysaid
 *    Mail: admin@wysaid.org
 *    Blog: http://blog.wysaid.org
@@ -22,15 +22,15 @@ using namespace std;
 template<class T>
 static inline void line(T p1, T p2)
 {
-	//3d×ø±êÏµÓë´°¿Ú×ø±êÏµy·½ÏòÏà·´
-	//Ê¹ÓÃ height - y À´ĞŞÕı.
+	//3dåæ ‡ç³»ä¸çª—å£åæ ‡ç³»yæ–¹å‘ç›¸å
+	//ä½¿ç”¨ height - y æ¥ä¿®æ­£.
 	line(p1[0], SCREEN_HEIGHT - p1[1], p2[0], SCREEN_HEIGHT - p2[1]);
 }
 
 class Object3d
 {
 protected:
-	//±ÜÃâ´óÁ¿¿½±´´øÀ´¿ªÏú, ²»ÔÊĞíÖ±½Ó´´½¨ÊµÀı, Ö»ÄÜÍ¨¹ıcreate·½·¨´´½¨Ö¸Õë.
+	//é¿å…å¤§é‡æ‹·è´å¸¦æ¥å¼€é”€, ä¸å…è®¸ç›´æ¥åˆ›å»ºå®ä¾‹, åªèƒ½é€šè¿‡createæ–¹æ³•åˆ›å»ºæŒ‡é’ˆ.
 	Object3d() : m_matrix(Mat4::makeIdentity()) {}
 public:
 	~Object3d() {}
@@ -81,7 +81,7 @@ protected:
 	Mat4 m_matrix;
 };
 
-//Ê¹ÓÃxOzÆ½Ãæ½øĞĞÂşÓÎ£¬ y·½Ïò³¯ÉÏ.
+//ä½¿ç”¨xOzå¹³é¢è¿›è¡Œæ¼«æ¸¸ï¼Œ yæ–¹å‘æœä¸Š.
 class Scene : public SceneInterface
 {
 public:
@@ -127,7 +127,7 @@ class Mesh : public Object3d
 public:
 	static inline Mesh* create(int w, int h)
 	{
-		assert(w > 0 && h > 0); //¿í¸ß±ØĞë´óÓÚ0
+		assert(w > 0 && h > 0); //å®½é«˜å¿…é¡»å¤§äº0
 		
 		Mesh* m = new Mesh;
 		m->m_width = w + 1;
@@ -184,7 +184,7 @@ public:
 
 #define TRANS_VEC2I_TYPE(v) Vec2i(v[0], v[1])
 
-				//ÄæÊ±Õë·½Ïò»æÖÆ
+				//é€†æ—¶é’ˆæ–¹å‘ç»˜åˆ¶
 				const Vec2i pnts[4] = {
 					TRANS_VEC2I_TYPE(v1),
 					TRANS_VEC2I_TYPE(v2),
@@ -196,7 +196,7 @@ public:
 				if ((unsigned&)v1[0] != 0xffffffff && (unsigned&)v2[0] != 0xffffffff
 					&& (unsigned&)v3[0] != 0xffffffff && (unsigned&)v4[0] != 0xffffffff)
 				{
-//					fillpoly(4, &pnts[0][0]); //Ìî³ä¾ØĞÎÇøÓò
+//					fillpoly(4, &pnts[0][0]); //å¡«å……çŸ©å½¢åŒºåŸŸ
 //					drawpoly(4, &pnts[0][0]);
 
 					line(pnts[0], pnts[1]);
@@ -298,27 +298,27 @@ Mesh* getMesh(int w, int h, const Vec3f& rot, const Vec3f& scaling, const Vec3f&
 
 void initScene(Scene& s)
 {
-	//µØÃæ
+	//åœ°é¢
 	Mesh* m = getMesh(16, 16, Vec3f(0.0f, 0.0f, 0.0f), Vec3f(2000.0f, 2000.0f, 2000.0f), Vec3f(0.0f, 0.0f, 0.0f));
 	s.addObject(m);
 
-	//Ç°ÃæÇ½
+	//å‰é¢å¢™
 	m = getMesh(16, 4, Vec3f((float)M_PI / 2.0f, 0.0f, 0.0f), Vec3f(2000.0f, 500.0f, 2000.0f), Vec3f(0.0f, -1000.0f, 250.0f));
 	s.addObject(m);
 
-	//ºóÃæÇ½
+	//åé¢å¢™
 	m = getMesh(16, 4, Vec3f((float)M_PI / 2.0f, 0.0f, 0.0f), Vec3f(2000.0f, 500.0f, 2000.0f), Vec3f(0.0f, 1000.0f, 250.0f));
 	s.addObject(m);
 
-	//×ó²àÇ½
+	//å·¦ä¾§å¢™
 	m = getMesh(4, 16, Vec3f(0.0f, (float)M_PI / 2.0f, 0.0f), Vec3f(500.0f, 2000.0f, 2000.0f), Vec3f(1000.0f, 0.0f, 250.0f));
 	s.addObject(m);
 
-	//ÓÒ²àÇ½
+	//å³ä¾§å¢™
 	m = getMesh(4, 16, Vec3f(0.0f, (float)M_PI / 2.0f, 0.0f), Vec3f(500.0f, 2000.0f, 2000.0f), Vec3f(-1000.0f, 0.0f, 250.0f));
 	s.addObject(m);
 
-	//Ìì»¨°å
+	//å¤©èŠ±æ¿
 // 	m = getMesh(16, 16, Vec3f(0.0f, 0.0f, 0.0f), Vec3f(2000.0f, 2000.0f, 2000.0f), Vec3f(0.0f, 0.0f, 500.0f));
 // 	s.addObject(m);
 
@@ -339,13 +339,13 @@ int main()
 
 	const Vec4f viewPort(0.0f, 0.0f, SCREEN_WIDTH, SCREEN_HEIGHT);
 	const float motion = 5.0f;
-	const float standupHeight = 120.0f; //µØ°å¸ß¶ÈÎª0£¬ ÈËÕ¾Á¢ÑÛ¾¦¸ß¶È120
-	float jumpSpeed = 0.0f; //ÌøÆğËÙ¶È
-	float gravityAccSpeed = -0.3f; //ÖØÁ¦¼ÓËÙ¶È
+	const float standupHeight = 120.0f; //åœ°æ¿é«˜åº¦ä¸º0ï¼Œ äººç«™ç«‹çœ¼ç›é«˜åº¦120
+	float jumpSpeed = 0.0f; //è·³èµ·é€Ÿåº¦
+	float gravityAccSpeed = -0.3f; //é‡åŠ›åŠ é€Ÿåº¦
 	char textBuffer[1024];
 
 	scene.setEyeXY(Vec2f(0.0f, 500.0f));
-	scene.setEyeZ(standupHeight); // Õ¾Á¢¹Û²ì¸ß¶È
+	scene.setEyeZ(standupHeight); // ç«™ç«‹è§‚å¯Ÿé«˜åº¦
 	scene.setLookdirXY(Vec2f(0.0f, -1000.0f));
 	scene.updatePerspective();
 	scene.updateView();
@@ -436,7 +436,7 @@ int main()
 
 		static unsigned int frameCount = 0;
 		if(frameCount % 6 == 0)
-			sprintf(textBuffer, "Ê¹ÓÃ·½Ïò¼ü¿ØÖÆÊÓµãÒÆ¶¯, Êó±ê°´×¡²»·ÅÍÏ¶¯ÊÓ½Ç\n¿Õ¸ñ¼üÌøÔ¾, Êó±ê¹öÂÖµ÷½ÚÊÓ¾°Çø\neye: %g, %g\nheight: %g\nlook dir: %g, %g", eye[0], eye[1], scene.eyeZ(), scene.lookDirXY()[0], scene.lookDirXY()[1]);
+			sprintf(textBuffer, "ä½¿ç”¨æ–¹å‘é”®æ§åˆ¶è§†ç‚¹ç§»åŠ¨, é¼ æ ‡æŒ‰ä½ä¸æ”¾æ‹–åŠ¨è§†è§’\nç©ºæ ¼é”®è·³è·ƒ, é¼ æ ‡æ»šè½®è°ƒèŠ‚è§†æ™¯åŒº\neye: %g, %g\nheight: %g\nlook dir: %g, %g", eye[0], eye[1], scene.eyeZ(), scene.lookDirXY()[0], scene.lookDirXY()[1]);
 
 		++frameCount;
 		setcolor(0x773333);

@@ -1,0 +1,15 @@
+{
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.errorSquiggles": "disabled",
+    "cmake.configureArgs": [
+        "-DCMAKE_SYSTEM_NAME=Windows",
+        "-DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc",
+        "-DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++",
+        "-DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres",
+        "-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER",
+        "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY",
+        "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY",
+        "-DPKG_CONFIG_EXECUTABLE=x86_64-w64-mingw32-pkg-config",
+    ],
+    "C_Cpp.default.compilerPath": "x86_64-w64-mingw32-g++"
+}

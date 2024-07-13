@@ -1,0 +1,62 @@
+{
+    "version": 4,
+    "env": {
+        "systemIncludePath": [
+            "${workspaceFolder}/ege",
+            "${workspaceFolder}/ege/include"
+        ]
+    },
+    "configurations": [
+        {
+            "name": "Mac",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "defines": [
+                "_FORTIFY_SOURCE=0",
+                "SHOW_CONSOLE=1"
+            ],
+            "compilerArgs": [
+                "-mwindows",
+                "-static",
+                "-static-libgcc",
+                "-static-libstdc++"
+            ],
+            "includePath": [
+                "${myDefaultIncludePath}"
+            ],
+            "configurationProvider": "ms-vscode.cmake-tools"
+        },
+        {
+            "name": "Linux",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "compilerPath": "x86_64-w64-mingw32-g++",
+            "defines": [
+                "_FORTIFY_SOURCE=0",
+                "SHOW_CONSOLE=1"
+            ],
+            "compilerArgs": [
+                "-mwindows",
+                "-static",
+                "-static-libgcc",
+                "-static-libstdc++"
+            ],
+            "includePath": [
+                "${myDefaultIncludePath}"
+            ],
+            "configurationProvider": "ms-vscode.cmake-tools"
+        },
+        {
+            "name": "Win32",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "compilerPath": "${default}",
+            "includePath": [
+                "${myDefaultIncludePath}",
+                "SHOW_CONSOLE=1"
+            ],
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ],
+    "enableConfigurationSquiggles": false
+}
