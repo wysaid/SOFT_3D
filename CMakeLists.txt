@@ -79,7 +79,7 @@ if (MSVC)
         message(FATAL_ERROR "你的 MSVC 版本太老了, 请使用 vs2015 或更新版本的 MSVC 编译器. 与时俱进吧, 不要一直使用十年前的编译器.")
     endif ()
 
-    target_compile_options(ege-common INTERFACE /source-charset:utf-8 /MP ${CPP_COMPILE_OPTIONS} /D_USE_MATH_DEFINES /D__STDC_LIMIT_MACROS "$<$<CONFIG:DEBUG>:/DDEBUG>" "$<$<CONFIG:RELEASE>:/DNDEBUG>" "$<$<CONFIG:RELWITHDEBINFO>:/DNDEBUG>" "$<$<CONFIG:MINSIZEREL>:/DNDEBUG>" "$<IF:$<CONFIG:Debug>,/MDd,/MD>")
+    target_compile_options(ege-common INTERFACE /source-charset:utf-8 /MP ${CPP_COMPILE_OPTIONS} /D_USE_MATH_DEFINES /D__STDC_LIMIT_MACROS "$<$<CONFIG:DEBUG>:/DDEBUG>" "$<$<CONFIG:RELEASE>:/DNDEBUG>" "$<$<CONFIG:RELWITHDEBINFO>:/DNDEBUG>" "$<$<CONFIG:MINSIZEREL>:/DNDEBUG>" "$<IF:$<CONFIG:Debug>,/MTd,/MT>")
 endif ()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
